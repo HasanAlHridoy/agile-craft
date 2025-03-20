@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:agile_crafts_task/injectors.dart';
+import 'package:agile_crafts_task/src/features/home/controller/home.dart';
 import 'package:agile_crafts_task/src/features/home/model/request/product.dart';
 import 'package:agile_crafts_task/src/features/home/model/response/product.dart';
 import 'package:agile_crafts_task/src/features/home/repository/home.dart';
@@ -10,14 +14,14 @@ import 'package:path/path.dart';
 
 // typedef ProductNotifier = AutoDisposeNotifierProviderFamily<CreateProductProvider, void,ProductModel>;
 // final createProductProvider = ProductNotifier(CreateProductProvider.new);
-typedef CreateProductNotifier = AutoDisposeNotifierProviderFamily<CreateProductProvider,void, ProductModel?>;
+typedef CreateProductNotifier = AutoDisposeNotifierProviderFamily<CreateProductProvider, void, ProductModel?>;
 final createProductProvider = CreateProductNotifier(CreateProductProvider.new);
+
 class CreateProductProvider extends AutoDisposeFamilyNotifier<void, ProductModel?> {
   final createProductFormKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   bool isAvailable = false;
-
 
   @override
   void build(ProductModel? arg) {
@@ -27,7 +31,7 @@ class CreateProductProvider extends AutoDisposeFamilyNotifier<void, ProductModel
       isAvailable = arg.isAvailable;
     }
   }
- 
+
   // Toggle the availability of the product
   void toggleIsAvailable() {
     isAvailable = !isAvailable;
@@ -35,26 +39,7 @@ class CreateProductProvider extends AutoDisposeFamilyNotifier<void, ProductModel
   }
 
   // Create a new product
-  Future<void> createProduct(BuildContext context) async{
-    if (!(createProductFormKey.currentState?.validate() ?? false)) return;
-    final name = nameController.text;
-    final description = descriptionController.text;
-
-    final product = ProductRequestModel(name: name, description: description, isAvailable: isAvailable);
-    final response = await sl<HomeRepository>().saveProductData( product);
-    response.fold(
-      (error) {
-        CustomSnackbar.show(context, error.toString(), isError: true);
-      },
-      (success) {
-        CustomSnackbar.show(context, 'Product created successfully');
-        context.pop();
-      },
-    );
-  }
-
-  // Edit an existing product
-  Future<void> editProduct(BuildContext context, String id) async{
+  Future<void> createProduct(BuildContext context) async {
     if (!(createProductFormKey.currentState?.validate() ?? false)) return;
     final name = nameController.text;
     final description = descriptionController.text;
@@ -65,11 +50,37 @@ class CreateProductProvider extends AutoDisposeFamilyNotifier<void, ProductModel
       (error) {
         CustomSnackbar.show(context, error.toString(), isError: true);
       },
-      (success) {
-        CustomSnackbar.show(context, 'Product updated successfully');
+      (success) async {
+        CustomSnackbar.show(context, 'Product created successfully');
+        ref.invalidate(productProvider);
         context.pop();
       },
     );
   }
-  
+
+  // Edit an existing product
+  Future<void> editProduct(BuildContext context, int id) async {
+    if (!(createProductFormKey.currentState?.validate() ?? false)) return;
+    final name = nameController.text;
+    final description = descriptionController.text;
+
+    final product = ProductRequestModel(
+      tenantId: 10,
+      name: name,
+      description: description,
+      isAvailable: isAvailable,
+      id: id,
+    );
+    final response = await sl<HomeRepository>().updateProductData(product);
+    response.fold(
+      (error) {
+        CustomSnackbar.show(context, error.toString(), isError: true);
+      },
+      (success) {
+        CustomSnackbar.show(context, 'Product updated successfully');
+        ref.invalidate(productProvider);
+        context.pop();
+      },
+    );
+  }
 }

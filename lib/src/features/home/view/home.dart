@@ -49,7 +49,7 @@ class HomeView extends ConsumerWidget {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return CustomDialog();
+                              return CustomDialog(product: notifier.products[index]);
                             },
                           );
                         },

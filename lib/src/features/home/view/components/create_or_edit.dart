@@ -5,6 +5,7 @@ import 'package:agile_crafts_task/src/features/home/controller/create_product.da
 import 'package:agile_crafts_task/src/features/home/model/response/product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomDialog extends ConsumerWidget {
   final ProductModel? product;
@@ -28,7 +29,7 @@ class CustomDialog extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text('Edit Product', style: context.text.titleLarge)),
+                  Expanded(child: Text('Create / Edit Product', style: context.text.titleLarge)),
                   IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.close)),
                 ],
               ),
@@ -62,7 +63,9 @@ class CustomDialog extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton(
                       style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.red)),
-                      onPressed: () {},
+                      onPressed: () {
+                        context.pop();
+                      },
                       child: Text('Cancel'),
                     ),
                   ),
@@ -70,7 +73,11 @@ class CustomDialog extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        notifier.createProduct(context);
+                        if (product == null) {
+                          notifier.createProduct(context);
+                        } else {
+                          notifier.editProduct(context, product!.id);
+                        }
                       },
                       child: Text('Save'),
                     ),

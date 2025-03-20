@@ -49,4 +49,23 @@ class HomeRepository {
       return Left(e);
     }
   }
+  Future<Either> updateProductData(ProductRequestModel requestProductModel) async {
+    try {
+      final response = await _apiClient.request(
+        ApiClientMethod.patch,
+        'services/app/ProductSync/CreateOrEdit',
+        data: requestProductModel.toJson(),
+        isAuthRequired: true,
+      );
+      return Right(response);
+    } on SocketException catch (e) {
+      return Left('No internet connection. $e');
+    } catch (e) {
+      log('Error in Product: $e');
+      return Left(e);
+    }
+  }
 }
+
+
+

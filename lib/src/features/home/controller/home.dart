@@ -9,16 +9,15 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart';
 
-typedef ProductNotifier = AsyncNotifierProvider<ProductProvider, List<ProductModel>>;
+typedef ProductNotifier = AutoDisposeAsyncNotifierProvider<ProductProvider, List<ProductModel>>;
 final productProvider = ProductNotifier(ProductProvider.new);
 
-class ProductProvider extends AsyncNotifier<List<ProductModel>> {
+class ProductProvider extends AutoDisposeAsyncNotifier<List<ProductModel>> {
   List<ProductModel> products = [];
   @override
   FutureOr<List<ProductModel>> build() async {
     final response = await sl<HomeRepository>().fetchProductData();
 
-    log('Hasan: $response');
     response.fold(
       (error) {
         throw Exception(error);
