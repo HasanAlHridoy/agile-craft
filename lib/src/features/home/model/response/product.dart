@@ -12,9 +12,9 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      json[_Json.tenantId],
-      json[_Json.name],
-      json[_Json.description],
+      json[_Json.tenantId] ?? 10,
+      json[_Json.name] ?? '',
+      json[_Json.description] ?? '',
       json[_Json.isAvailable],
       json[_Json.id],
     );
