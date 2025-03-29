@@ -5,6 +5,7 @@ import 'package:agile_crafts_task/src/core/utils/extensions/context.dart';
 import 'package:agile_crafts_task/src/core/utils/extensions/double.dart';
 import 'package:agile_crafts_task/src/features/home/controller/home.dart';
 import 'package:agile_crafts_task/src/features/home/view/components/create_or_edit.dart';
+import 'package:agile_crafts_task/src/shared/internet/provider/internet.dart';
 import 'package:agile_crafts_task/src/shared/riverpod/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +23,6 @@ class HomeView extends ConsumerWidget {
           loading: riverpodLoading,
           data: (_) {
             final notifier = ref.watch(productProvider.notifier);
-            log(notifier.products.toString());
             return Scaffold(
               appBar: AppBar(
                 title: Text('Products'),

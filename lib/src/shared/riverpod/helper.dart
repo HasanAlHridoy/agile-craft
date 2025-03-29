@@ -36,7 +36,6 @@ class KError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(e);
     return Material(
       color: context.theme.scaffoldBackgroundColor,
       child: Center(

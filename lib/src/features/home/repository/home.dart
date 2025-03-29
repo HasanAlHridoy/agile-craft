@@ -7,6 +7,7 @@ import 'package:agile_crafts_task/src/core/network/api_client.dart';
 import 'package:agile_crafts_task/src/features/home/model/request/product.dart';
 import 'package:agile_crafts_task/src/features/home/model/response/product.dart';
 import 'package:agile_crafts_task/src/shared/enum/method.dart';
+import 'package:agile_crafts_task/src/shared/internet/provider/internet.dart';
 import 'package:dartz/dartz.dart';
 
 class HomeRepository {
@@ -16,6 +17,17 @@ class HomeRepository {
   HomeRepository(this._apiClient, this._hiveService);
 
   Future<Either> fetchProductData() async {
+    final isConnected = await isOnline();
+
+    if (!isConnected) {
+      final data = _hiveService.getProductData();
+      if (data != null) {
+        log('No internet connection, using cached data.');
+        return Right(data);
+      } else {
+        return Left('No internet connection and no cached data available.');
+      }
+    }
     try {
       final response = await _apiClient.request(
         ApiClientMethod.get,
@@ -23,7 +35,10 @@ class HomeRepository {
         isAuthRequired: true,
       );
       final data = ProductModel.fromJsonList(json.decode(response));
-      log('Response type: ${data.first.name}');
+      log('Product Data using internet');
+      if (data.isNotEmpty) {
+        await _hiveService.putProductData(data);
+      }
       return Right(data);
     } on SocketException catch (e) {
       return Left('No internet connection. $e');
@@ -49,6 +64,7 @@ class HomeRepository {
       return Left(e);
     }
   }
+
   Future<Either> updateProductData(ProductRequestModel requestProductModel) async {
     try {
       final response = await _apiClient.request(
@@ -66,6 +82,3 @@ class HomeRepository {
     }
   }
 }
-
-
-
